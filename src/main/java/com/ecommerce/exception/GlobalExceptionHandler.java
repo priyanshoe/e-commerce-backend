@@ -24,12 +24,12 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(UserAlreayExist.class)
 	public ResponseEntity<ApiResponseDto> handleUserNotFound(UserAlreayExist ex){
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto(false,ex.getMessage(),null));
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponseDto(false,ex.getMessage(),null));
 	}
 
 	@ExceptionHandler(BadCredential.class)
 	public ResponseEntity<ApiResponseDto> handleBadCredential(BadCredential ex){
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto(false,ex.getMessage(),null));
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponseDto(false,ex.getMessage(),null));
 	}
 	
 	@ExceptionHandler(NotFound.class)
@@ -39,6 +39,6 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(Conflict.class)
 	public ResponseEntity<ApiResponseDto> handleConflict(Conflict ex){
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto(false,ex.getMessage(),null));
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponseDto(false,ex.getMessage(),null));
 	}
 }

@@ -2,6 +2,7 @@ package com.ecommerce.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.Dto.ApiResponseDto;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthService {
 
 	private final UserRepository userRepo;
+	private final PasswordEncoder encoder;
 	
 	// register
 	public ResponseEntity<ApiResponseDto> registerUser(UserRequestDto newUser){
@@ -30,6 +32,7 @@ public class AuthService {
 		// check Role should not be == ADMIN
 		
 		User user = new User(newUser);
+		user.setPassword(encoder.encode(newUser.getPassword()));
 		User savedUser = userRepo.save(user);
 		UserResponseDto response = new UserResponseDto(savedUser);
 		return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto(true,"user registered", response));
