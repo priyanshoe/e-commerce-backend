@@ -17,6 +17,12 @@ public class GlobalExceptionHandler {
 	}
 	
 	// user exceptions
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<ApiResponseDto> handleAccessDeniedException(AccessDeniedException ex){
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponseDto(false,ex.getMessage(),null));
+	}
+	
+	// user exceptions
 	@ExceptionHandler(UserNotFound.class)
 	public ResponseEntity<ApiResponseDto> handleUserNotFound(UserNotFound ex){
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto(false,ex.getMessage(),null));

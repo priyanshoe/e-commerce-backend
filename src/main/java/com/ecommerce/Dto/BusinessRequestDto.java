@@ -1,0 +1,28 @@
+package com.ecommerce.Dto;
+
+import com.ecommerce.entity.Business;
+import com.ecommerce.entity.BusinessStatus;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class BusinessRequestDto {
+
+	private String name;
+	private String description;
+	private String email;
+	private String phone;
+	private String address;
+	
+	public BusinessRequestDto(Business business) {
+		this.name = business.getName();
+		this.description = business.getDescription();
+		this.email = business.getEmail();
+		this.phone = business.getPhone();
+		this.address = business.getAddress();
+	}
+}
