@@ -1,7 +1,6 @@
 package com.ecommerce.Dto;
 
 import com.ecommerce.entity.Business;
-import com.ecommerce.entity.BusinessStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

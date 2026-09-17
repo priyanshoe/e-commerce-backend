@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.ecommerce.Dto.BusinessRequestDto;
+import com.ecommerce.Enum.BusinessStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,6 +36,7 @@ public class Business {
 	
 	@ManyToOne
 	@JoinColumn(name = "seller_id", nullable = false)
+	@JsonIgnore
 	private User seller;
 	
 	private String name;
@@ -43,6 +46,8 @@ public class Business {
 	private String address;
 	@Enumerated(EnumType.STRING)
 	private BusinessStatus status = BusinessStatus.ACTIVE;
+	
+	// map products here
 	
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false, updatable = false)
