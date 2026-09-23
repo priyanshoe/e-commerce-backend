@@ -1,6 +1,7 @@
 package com.ecommerce.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,4 +29,11 @@ public class AuthController {
 	public ResponseEntity<ApiResponseDto> login(@RequestBody UserRequestDto reqUser){
 		return authService.loginUser(reqUser);
 	}
+	
+	@GetMapping("/me")
+	public ResponseEntity<ApiResponseDto> getUser(){
+		return authService.authMe();
+	}
+	
+	
 }

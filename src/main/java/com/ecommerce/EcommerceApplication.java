@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.Dto.ApiResponseDto;
 
+@RestController
 @SpringBootApplication
 public class EcommerceApplication {
 
@@ -16,15 +17,11 @@ public class EcommerceApplication {
 		SpringApplication.run(EcommerceApplication.class, args);
 		System.err.println("server running");
 	}
-
-}
-
-
-@RestController
-class InitialCheck{
 	
+
 	@GetMapping({"/","/health", "/status"})
 	public ResponseEntity<ApiResponseDto> Server(){
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"server is running",null));
 	}
+
 }

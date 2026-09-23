@@ -35,20 +35,21 @@ public class BusinessService {
 	
 	public ResponseEntity<ApiResponseDto> getBusinessById(Long id){
 		Business business = businessRepo.findById(id).orElseThrow(()-> new NotFound("business"));
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final String email = authentication.getName();
+		User user = userRepo.findByEmail(email).orElseThrow(()-> new NotFound("seller"));
+		if(!business.getSeller().getId().equals(user.getId())) {
+		    throw new AccessDeniedException("You don't own this business");
+		}
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"business fetched",business));
 	}
 	
-	
-	public ResponseEntity<ApiResponseDto> getBusinessesBySeller(Long id){
-		List<Business> business = businessRepo.findBySeller_Id(id);
-		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"seller businesses fetched",business));
-	}
 	
 	public ResponseEntity<ApiResponseDto> getMyBusinesses(){
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		final String email = authentication.getName();
 		User seller = userRepo.findByEmail(email).orElseThrow(()-> new AccessDeniedException("not authenticated user"));
-		List<Business> business = businessRepo.findBySeller_Id(seller.getId());
+		List<Business> business = businessRepo.findBySeller(seller);
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"seller businesses fetched",business));
 	}
 	
@@ -96,10 +97,5 @@ public class BusinessService {
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"business deleted",business));
 	}
 	
-	
-//	public ResponseEntity<ApiResponseDto> deleteBusinessBySeller(Long id){
-//		businessRepo.deleteAllBySeller_Id(id);
-//		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"business deleted",null));
-//	}
 	
 }

@@ -22,10 +22,11 @@ import lombok.RequiredArgsConstructor;
 public class BusinessController {
 	
 	private final BusinessService businessService;
-	
+
+
 	@GetMapping
-	public ResponseEntity<ApiResponseDto> getBusiness() {
-		return businessService.getBusinesses(); 
+	public ResponseEntity<ApiResponseDto> getSellerBusiness() {
+		return businessService.getMyBusinesses(); 
 	}
 	
 	@GetMapping("/{id}")
@@ -33,17 +34,7 @@ public class BusinessController {
 		return businessService.getBusinessById(id); 
 	}
 
-	@GetMapping("/seller/{id}")
-	public ResponseEntity<ApiResponseDto> getBusinessBySeller(@PathVariable Long id) {
-		return businessService.getBusinessesBySeller(id); 
-	}
-
-	@GetMapping("/seller")
-	public ResponseEntity<ApiResponseDto> getUserBusiness() {
-		return businessService.getMyBusinesses(); 
-	}
-
-	@PostMapping("/create")
+	@PostMapping
 	public ResponseEntity<ApiResponseDto> createBusiness(@RequestBody BusinessRequestDto newBusiness) {
 		return businessService.addBusiness(newBusiness); 
 	}

@@ -33,7 +33,7 @@ public class SecurityConfig {
 		.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/auth/**","/health","/status","/").permitAll()
-				.requestMatchers("/user","/business").hasRole("ADMIN")
+				.requestMatchers("/user").hasRole("ADMIN")
 				.requestMatchers("/business/**").hasAnyRole("ADMIN","SELLER")
 				.requestMatchers("/**").hasAnyRole("ADMIN","SELLER","CUSTOMER")
 				.anyRequest().authenticated()
@@ -58,7 +58,7 @@ public class SecurityConfig {
 	CorsConfigurationSource corsConfigurationSource() throws Exception {
 		CorsConfiguration config = new CorsConfiguration();
 		
-		config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:5173"));
+		config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:5173","*"));
 		config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		
