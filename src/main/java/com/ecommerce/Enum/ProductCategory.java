@@ -2,6 +2,10 @@ package com.ecommerce.Enum;
 
 public enum ProductCategory {
 	ELECTRONICS,
-	FOOD,	
-	HOME
+	HOME,
+	FASHION,
+	BEAUTY,
+	STATIONERY,
+	SPORTS,
+	FOOD
 }

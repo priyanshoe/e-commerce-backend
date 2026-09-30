@@ -11,4 +11,6 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
 
 	List<Business> findBySeller(User seller);
 
+	List<Business> findTop4ByOrderByCreatedAt();
+
 }

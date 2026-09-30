@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.Dto.ApiResponseDto;
 import com.ecommerce.Dto.BusinessRequestDto;
+import com.ecommerce.Dto.ProductRequestDto;
 import com.ecommerce.service.BusinessService;
+import com.ecommerce.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,10 +25,15 @@ public class BusinessController {
 	
 	private final BusinessService businessService;
 
-
+	
 	@GetMapping
 	public ResponseEntity<ApiResponseDto> getSellerBusiness() {
 		return businessService.getMyBusinesses(); 
+	}
+	
+	@GetMapping("/feature")
+	public ResponseEntity<ApiResponseDto> getTopBusiness() {
+		return businessService.getTop4Businesses(); 
 	}
 	
 	@GetMapping("/{id}")

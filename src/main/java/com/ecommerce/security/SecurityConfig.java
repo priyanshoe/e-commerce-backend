@@ -33,9 +33,9 @@ public class SecurityConfig {
 		.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/auth/**","/health","/status","/").permitAll()
+				.requestMatchers("/product","/product/*","/business/feature").permitAll()
 				.requestMatchers("/user").hasRole("ADMIN")
 				.requestMatchers("/business/**").hasAnyRole("ADMIN","SELLER")
-				.requestMatchers("/**").hasAnyRole("ADMIN","SELLER","CUSTOMER")
 				.anyRequest().authenticated()
 				)
 		.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -59,7 +59,7 @@ public class SecurityConfig {
 		CorsConfiguration config = new CorsConfiguration();
 		
 		config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:5173","*"));
-		config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+		config.setAllowedMethods(List.of("GET","POST","PATCH","PUT","DELETE","OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

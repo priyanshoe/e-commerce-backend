@@ -33,6 +33,13 @@ public class BusinessService {
 	}
 	
 	
+	public ResponseEntity<ApiResponseDto> getTop4Businesses(){
+		List<Business> businesses = businessRepo.findTop4ByOrderByCreatedAt();
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"businesses fetched",businesses));
+	}
+	
+	
+	
 	public ResponseEntity<ApiResponseDto> getBusinessById(Long id){
 		Business business = businessRepo.findById(id).orElseThrow(()-> new NotFound("business"));
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -80,6 +87,7 @@ public class BusinessService {
 		existingBusiness.setEmail(updateBusiness.getEmail());
 		existingBusiness.setPhone(updateBusiness.getPhone());
 		existingBusiness.setAddress(updateBusiness.getAddress());
+		existingBusiness.setStatus(updateBusiness.getStatus());
 		Business savedBusiness = businessRepo.save(existingBusiness);
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"business updated",savedBusiness));
 	}

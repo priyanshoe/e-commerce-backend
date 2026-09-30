@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class ProductRequestDto {
 	
-	private Long businessId;
 	private String name;
 	private String description;
 	private double price;

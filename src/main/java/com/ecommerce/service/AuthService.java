@@ -65,7 +65,8 @@ public class AuthService {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			final String email = authentication.getName();
 			User user = userRepo.findByEmail(email).orElseThrow(()-> new AccessDeniedException("user not authenticated"));
-			return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"user authenticated", null));
+			UserResponseDto userResDto = new UserResponseDto(user);
+			return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"user authenticated", userResDto));
 		} catch (Exception ex) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponseDto(false,ex.getMessage(), null));
 		}
