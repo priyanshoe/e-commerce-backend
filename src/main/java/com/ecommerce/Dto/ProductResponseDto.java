@@ -2,7 +2,6 @@ package com.ecommerce.Dto;
 
 import java.util.HashMap;
 
-import com.ecommerce.Enum.BusinessStatus;
 import com.ecommerce.Enum.ProductCategory;
 import com.ecommerce.entity.Product;
 

@@ -102,7 +102,7 @@ public class BusinessService {
 		    throw new AccessDeniedException("You don't own this business");
 		}
 		businessRepo.delete(business);;
-		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"business deleted",business));
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"business deleted",null));
 	}
 	
 	

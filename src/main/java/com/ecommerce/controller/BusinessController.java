@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.Dto.ApiResponseDto;
 import com.ecommerce.Dto.BusinessRequestDto;
-import com.ecommerce.Dto.ProductRequestDto;
 import com.ecommerce.service.BusinessService;
-import com.ecommerce.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
