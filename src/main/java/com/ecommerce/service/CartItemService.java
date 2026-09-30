@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.Dto.ApiResponseDto;
 import com.ecommerce.Dto.CartItemResponseDto;
-import com.ecommerce.Dto.ProductResponseDto;
-import com.ecommerce.entity.Business;
 import com.ecommerce.entity.CartItem;
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.User;
@@ -58,6 +56,27 @@ public class CartItemService {
 				
 		CartItemResponseDto response = new CartItemResponseDto(cartItem);
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"item added to cart",response));
+	}
+	
+
+	public ResponseEntity<ApiResponseDto> UpdateQuantity(Long id,int quantity){
+		if(quantity<=0) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto(false,"quntity should greater than zero",null));
+		}
+		
+		CartItem existingCartItem = cartItemRepo.findById(id).orElseThrow(()-> new NotFound("cart item with id: "+id));
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final String email = authentication.getName();
+		User customer = userRepo.findByEmail(email).orElseThrow(()-> new NotFound("seller"));
+		if (!customer.getId().equals(existingCartItem.getCustomer().getId())) {
+		    throw new AccessDeniedException("You don't own this business");
+		}
+
+		existingCartItem.setQuantity(quantity);
+		CartItem updatedCartItem = cartItemRepo.save(existingCartItem);
+		CartItemResponseDto response = new CartItemResponseDto(updatedCartItem);
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"cart item quantity updated",response));
 	}
 	
 	
