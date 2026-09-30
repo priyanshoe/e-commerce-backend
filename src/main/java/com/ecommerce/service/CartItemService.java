@@ -14,6 +14,7 @@ import com.ecommerce.entity.CartItem;
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.User;
 import com.ecommerce.exception.AccessDeniedException;
+import com.ecommerce.exception.BadRequest;
 import com.ecommerce.exception.NotFound;
 import com.ecommerce.repository.CartItemRepository;
 import com.ecommerce.repository.ProductRepository;
@@ -43,7 +44,7 @@ public class CartItemService {
 
 	public ResponseEntity<ApiResponseDto> saveCartItem(Long productId, int quantity){
 		if(quantity<=0) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto(false,"quntity should greater than zero",null));
+			throw new BadRequest("quntity should greater than zero");
 		}
 		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -60,11 +61,14 @@ public class CartItemService {
 	
 
 	public ResponseEntity<ApiResponseDto> UpdateQuantity(Long id,int quantity){
-		if(quantity<=0) {
+		if(quantity<0) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto(false,"quntity should greater than zero",null));
 		}
 		
 		CartItem existingCartItem = cartItemRepo.findById(id).orElseThrow(()-> new NotFound("cart item with id: "+id));
+		if(existingCartItem.getQuantity() - quantity < 0) {
+			throw new BadRequest("not enough items");
+		}
 		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		final String email = authentication.getName();
@@ -91,7 +95,6 @@ public class CartItemService {
 		if (!customer.getId().equals(cartItem.getCustomer().getId())) {
 		    throw new AccessDeniedException("You don't own this cart item");
 		}
-		CartItemResponseDto response = new CartItemResponseDto(cartItem);
 		cartItemRepo.delete(cartItem);;
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"business deleted",null));
 	}

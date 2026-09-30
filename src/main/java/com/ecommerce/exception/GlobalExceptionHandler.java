@@ -47,4 +47,9 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponseDto> handleConflict(Conflict ex){
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponseDto(false,ex.getMessage(),null));
 	}
+
+	@ExceptionHandler(BadRequest.class)
+	public ResponseEntity<ApiResponseDto> handleBadRequest(BadRequest ex){
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto(false,ex.getMessage(),null));
+	}
 }
