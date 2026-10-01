@@ -9,7 +9,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import com.ecommerce.Enum.OrderStatus;
 import com.ecommerce.Enum.PaymentMethod;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,11 +35,12 @@ public class Order {
 	@JoinColumn(name = "customer_id", nullable = false)
 	private User customer;
 	
-	@OneToMany
-	@JoinColumn(name = "order_items", nullable = false)
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems;
 	private BigDecimal totalAmount;
+	@Enumerated(EnumType.STRING)
 	private PaymentMethod paymentMethod;
+	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 	
 	@CreationTimestamp
