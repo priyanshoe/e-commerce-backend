@@ -66,8 +66,8 @@ public class CartItemService {
 		}
 		
 		CartItem existingCartItem = cartItemRepo.findById(id).orElseThrow(()-> new NotFound("cart item with id: "+id));
-		if(existingCartItem.getQuantity() - quantity < 0) {
-			throw new BadRequest("not enough items");
+		if(existingCartItem.getProduct().getStock() - quantity < 0) {
+			throw new BadRequest("not enough items in stock");
 		}
 		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
