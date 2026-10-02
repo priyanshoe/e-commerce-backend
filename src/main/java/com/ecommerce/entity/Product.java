@@ -1,5 +1,6 @@
 package com.ecommerce.entity;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -41,7 +42,7 @@ public class Product {
 
 	private String name;
 	private String description;
-	private double price;
+	private BigDecimal price;
 	@Enumerated(EnumType.STRING)
 	private ProductCategory category;
 	private String imageUrl;

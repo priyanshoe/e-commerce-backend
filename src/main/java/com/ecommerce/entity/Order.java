@@ -37,7 +37,10 @@ public class Order {
 	
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems;
+	
 	private BigDecimal totalAmount;
+	private String shippingAddress;
+	
 	@Enumerated(EnumType.STRING)
 	private PaymentMethod paymentMethod;
 	@Enumerated(EnumType.STRING)
@@ -45,6 +48,6 @@ public class Order {
 	
 	@CreationTimestamp
 	private Timestamp orderDate;
-	private String shippingAddress;
+	
 
 }

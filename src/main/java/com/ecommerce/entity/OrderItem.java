@@ -29,6 +29,7 @@ public class OrderItem {
 	@JoinColumn(name = "product_id", nullable = false)
 	private Product product;
 	private BigDecimal price; // to prevent price change
+	private BigDecimal subTotal;
 	private int quantity;
 
 }
