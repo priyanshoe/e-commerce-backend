@@ -8,6 +8,6 @@ import lombok.Data;
 public class OrderRequestDto {
 	
 	private PaymentMethod paymentMethod;
-	private String address; 
+	private String shippingAddress; 
 
 }

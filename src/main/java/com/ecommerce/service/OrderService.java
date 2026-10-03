@@ -1,7 +1,10 @@
 package com.ecommerce.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +13,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.Dto.ApiResponseDto;
+import com.ecommerce.Dto.OrderItemResponseDto;
 import com.ecommerce.Dto.OrderRequestDto;
+import com.ecommerce.Dto.OrderResponseDto;
+import com.ecommerce.Dto.OrderSellerResponseDto;
 import com.ecommerce.Enum.OrderStatus;
+import com.ecommerce.entity.Business;
 import com.ecommerce.entity.CartItem;
 import com.ecommerce.entity.Order;
 import com.ecommerce.entity.OrderItem;
@@ -19,7 +26,9 @@ import com.ecommerce.entity.Product;
 import com.ecommerce.entity.User;
 import com.ecommerce.exception.BadRequest;
 import com.ecommerce.exception.NotFound;
+import com.ecommerce.repository.BusinessRepository;
 import com.ecommerce.repository.CartItemRepository;
+import com.ecommerce.repository.OrderItemRepository;
 import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.repository.UserRepository;
 
@@ -30,8 +39,26 @@ import lombok.RequiredArgsConstructor;
 public class OrderService {
 
 	private final OrderRepository orderRepo;
+	private final OrderItemRepository orderItemRepo;
 	private final UserRepository userRepo;
 	private final CartItemRepository cartRepo;
+	private final BusinessRepository businessRepo;
+	
+	
+
+	public ResponseEntity<ApiResponseDto> getOrderById(Long id){
+		
+		Order order = orderRepo.findById(id).orElseThrow(()-> new NotFound("order"));
+		OrderResponseDto orderDto = new OrderResponseDto(order);
+		List<OrderItem> orderItems = order.getOrderItems();
+		ArrayList<OrderItemResponseDto> orderItemDtoList = new ArrayList<OrderItemResponseDto>();
+		for(OrderItem orderItem:orderItems) {
+			OrderItemResponseDto orderItemDto  = new OrderItemResponseDto(orderItem);
+			orderItemDtoList.add(orderItemDto);
+		}
+		orderDto.setOrderItems(orderItemDtoList);
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"order fetched",orderDto));
+	}
 	
 
 	public ResponseEntity<ApiResponseDto> getMyOrders(){
@@ -45,6 +72,40 @@ public class OrderService {
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"user orders fetched",orders));
 	}
 	
+
+	public ResponseEntity<ApiResponseDto> getSellerOrders(){
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final String email = authentication.getName();
+		User user = userRepo.findByEmail(email).orElseThrow(()-> new NotFound("user"));
+		List<Business> business = businessRepo.findBySeller(user);
+		
+		ArrayList<OrderSellerResponseDto> orderDtoList = new ArrayList<OrderSellerResponseDto>();
+		Set<Long> orderIds = new HashSet<Long>();
+		for(Business item: business) { // for each business
+			
+			List<Order> orders = orderRepo.findOrdersByBusinessId(item.getId());
+			for(Order order:orders) { // for each order
+				OrderSellerResponseDto orderDto = new OrderSellerResponseDto(order);
+				if(!orderIds.add(order.getId())) {// prevent duplicate data
+					continue;
+				}
+				List<OrderItem> orderItems = orderItemRepo.findByOrder(order);
+				ArrayList<OrderItemResponseDto> orderItemDtoList = new ArrayList<OrderItemResponseDto>();
+				for(OrderItem orderItem:orderItems) { // for each order Item
+					OrderItemResponseDto orderItemDto = new OrderItemResponseDto(orderItem);
+					orderItemDtoList.add(orderItemDto);					
+				}
+				orderDto.setOrderItems(orderItemDtoList);
+				orderDtoList.add(orderDto);
+			}
+			
+		}
+		
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"seller orders fetched",orderDtoList));
+	}
+
+	
 	
 	public ResponseEntity<ApiResponseDto> createOrders(OrderRequestDto orderDto){
 
@@ -54,7 +115,7 @@ public class OrderService {
 		
 		Order newOrder = new Order();
 		newOrder.setCustomer(customer);
-		newOrder.setShippingAddress(orderDto.getAddress());
+		newOrder.setShippingAddress(orderDto.getShippingAddress());
 		newOrder.setPaymentMethod(orderDto.getPaymentMethod());
 		newOrder.setStatus(OrderStatus.PLACED);
 		
@@ -63,6 +124,7 @@ public class OrderService {
 		if(cartItems.isEmpty()) {
 			throw new BadRequest("no items in cart");
 		}
+		ArrayList<OrderItemResponseDto> orderItemDtoList = new ArrayList<OrderItemResponseDto>();
 		for(CartItem cartItem:cartItems) {
 			Product product = cartItem.getProduct();
 			OrderItem orderItem = new OrderItem();
@@ -75,11 +137,16 @@ public class OrderService {
 			totalAmount = totalAmount.add(subTotal);
 			
 			newOrder.getOrderItems().add(orderItem);
+			OrderItemResponseDto orderItemRes = new OrderItemResponseDto(orderItem);
+			orderItemDtoList.add(orderItemRes);
+			
 		}
 		newOrder.setTotalAmount(totalAmount);
 		Order savedOrder = orderRepo.save(newOrder);
+		OrderResponseDto orderResDto = new OrderResponseDto(savedOrder);
+		orderResDto.setOrderItems(orderItemDtoList);
 		
-		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"order created",savedOrder));
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"order created",orderResDto));
 	}
 	
 }
