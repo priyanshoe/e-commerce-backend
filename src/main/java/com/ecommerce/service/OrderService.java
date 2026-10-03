@@ -90,9 +90,12 @@ public class OrderService {
 				if(!orderIds.add(order.getId())) {// prevent duplicate data
 					continue;
 				}
-				List<OrderItem> orderItems = orderItemRepo.findByOrder(order);
+				List<OrderItem> orderItems = orderItemRepo.findByOrder(order); 
 				ArrayList<OrderItemResponseDto> orderItemDtoList = new ArrayList<OrderItemResponseDto>();
 				for(OrderItem orderItem:orderItems) { // for each order Item
+					if(!orderItem.getProduct().getBusiness().equals(item)) { // filter belongings items
+						continue;
+					}
 					OrderItemResponseDto orderItemDto = new OrderItemResponseDto(orderItem);
 					orderItemDtoList.add(orderItemDto);					
 				}
