@@ -2,6 +2,7 @@ package com.ecommerce.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.Dto.ApiResponseDto;
 import com.ecommerce.Dto.OrderRequestDto;
+import com.ecommerce.Enum.OrderStatus;
 import com.ecommerce.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,11 @@ public class OrderController {
 	@PostMapping
 	public ResponseEntity<ApiResponseDto> genrateOrder(@RequestBody OrderRequestDto newOrder){
 		return orderService.createOrders(newOrder);
+	}
+	
+	@PatchMapping("/{id}")
+	public ResponseEntity<ApiResponseDto> updateOrderStatus(@PathVariable Long id, @RequestBody OrderStatus status){
+		return orderService.updateOrderStatus(id,status);
 	}
 
 }

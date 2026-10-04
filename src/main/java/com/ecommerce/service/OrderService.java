@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import com.ecommerce.entity.Order;
 import com.ecommerce.entity.OrderItem;
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.User;
+import com.ecommerce.exception.AccessDeniedException;
 import com.ecommerce.exception.BadRequest;
 import com.ecommerce.exception.NotFound;
 import com.ecommerce.repository.BusinessRepository;
@@ -158,6 +160,40 @@ public class OrderService {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"order created",orderResDto));
 	}
+	
+	
+
+	public ResponseEntity<ApiResponseDto> updateOrderStatus(Long id, OrderStatus status){
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final String email = authentication.getName();
+		User seller = userRepo.findByEmail(email).orElseThrow(()-> new NotFound("user"));
+		
+		List<Business> business = businessRepo.findBySeller(seller);
+		Set<Long> buzIds = business.stream().map(Business::getId)
+				.collect(Collectors.toSet());
+		
+		Order existingOrder = orderRepo.findById(id).orElseThrow(()-> new NotFound("order with id: "+id));
+		
+		boolean isSellerOrder = existingOrder.getOrderItems().stream()
+			.anyMatch(item-> buzIds.contains(item.getProduct().getBusiness().getId()));
+		if(!isSellerOrder) {
+			throw new AccessDeniedException("you don't own this order");
+		}
+		
+		existingOrder.setStatus(status);
+		orderRepo.save(existingOrder);
+		
+		OrderResponseDto response = new OrderResponseDto(existingOrder);
+		ArrayList<OrderItemResponseDto> orderItemDto = existingOrder.getOrderItems().stream()
+				.map(OrderItemResponseDto::new)
+				.collect(Collectors.toCollection(ArrayList::new));
+		response.setOrderItems(orderItemDto);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"order status updated",response));
+	}
+	
+	
 	
 }
 
