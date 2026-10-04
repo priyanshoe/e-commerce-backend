@@ -32,6 +32,7 @@ import com.ecommerce.repository.OrderItemRepository;
 import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -109,7 +110,7 @@ public class OrderService {
 	}
 
 	
-	
+	@Transactional
 	public ResponseEntity<ApiResponseDto> createOrders(OrderRequestDto orderDto){
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -127,6 +128,11 @@ public class OrderService {
 		if(cartItems.isEmpty()) {
 			throw new BadRequest("no items in cart");
 		}
+		for(CartItem cartItem:cartItems) {
+			if(cartItem.getQuantity()> cartItem.getProduct().getStock()) {
+				throw new BadRequest("insuffessient stock for product "+cartItem.getProduct().getName());
+			}
+		}
 		ArrayList<OrderItemResponseDto> orderItemDtoList = new ArrayList<OrderItemResponseDto>();
 		for(CartItem cartItem:cartItems) {
 			Product product = cartItem.getProduct();
@@ -138,6 +144,7 @@ public class OrderService {
 			BigDecimal subTotal = orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
 			orderItem.setSubTotal(subTotal);
 			totalAmount = totalAmount.add(subTotal);
+			product.setStock(product.getStock() - cartItem.getQuantity());
 			
 			newOrder.getOrderItems().add(orderItem);
 			OrderItemResponseDto orderItemRes = new OrderItemResponseDto(orderItem);
