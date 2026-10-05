@@ -15,6 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PATCH;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,12 +34,18 @@ public class SecurityConfig {
 		.cors(cors -> {})
 		.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		.authorizeHttpRequests(auth -> auth
+				// public api's
 				.requestMatchers("/auth/**","/health","/status","/").permitAll()
-				.requestMatchers("/product","/product/*","/business/feature").permitAll()
-				.requestMatchers("/user","/admin").hasRole("ADMIN")
-				.requestMatchers("/business/**","/order/seller").hasAnyRole("ADMIN","SELLER")
-				.requestMatchers("/order/**").hasAnyRole("ADMIN","CUSTOMER","SELLER")
-				.requestMatchers("/cart/**").hasRole("CUSTOMER")
+				.requestMatchers(GET,"/product/**","/business/feature").permitAll()
+				// admin api's
+				.requestMatchers("/admin","/user").hasRole("ADMIN")
+				// seller api's
+				.requestMatchers("/business/**").hasRole("SELLER") // add order.PATCH
+				.requestMatchers(GET,"/order/seller").hasRole("SELLER")
+				.requestMatchers(PATCH,"/order/*").hasRole("SELLER")
+				// customer api's
+				.requestMatchers("/cart/**","/order/**").hasRole("CUSTOMER")
+				
 				.anyRequest().authenticated()
 				)
 		.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
