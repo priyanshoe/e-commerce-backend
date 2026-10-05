@@ -27,7 +27,6 @@ public class OrderSellerResponseDto {
 		this.id = order.getId();
 		this.customerId = order.getCustomer().getId();
 		this.shippingAddress = order.getShippingAddress();
-		this.totalAmount = order.getTotalAmount();
 		this.orderDate = order.getOrderDate();
 		this.paymentMethod = order.getPaymentMethod();
 		this.status = order.getStatus();

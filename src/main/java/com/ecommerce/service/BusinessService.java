@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.Dto.ApiResponseDto;
 import com.ecommerce.Dto.BusinessRequestDto;
+import com.ecommerce.Dto.BusinessResponseDto;
+import com.ecommerce.Enum.Role;
 import com.ecommerce.entity.Business;
 import com.ecommerce.entity.User;
 import com.ecommerce.exception.AccessDeniedException;
@@ -26,10 +28,17 @@ public class BusinessService {
 	private final BusinessRepository businessRepo;
 	private final UserRepository userRepo;
 	
-	
-	public ResponseEntity<ApiResponseDto> getBusinesses(){
+	// only for admin
+	public ResponseEntity<ApiResponseDto> getAllBusinesses(){
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final String email = authentication.getName();
+		User user = userRepo.findByEmail(email).orElseThrow(()-> new NotFound("user"));
+		if(!user.getRole().equals(Role.ADMIN)) {
+			throw new AccessDeniedException("only admin can access");
+		}
 		List<Business> businesses = businessRepo.findAll();
-		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"businesses fetched",businesses));
+		List<BusinessResponseDto> response = businesses.stream().map(BusinessResponseDto::new).toList();
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"businesses fetched",response));
 	}
 	
 	

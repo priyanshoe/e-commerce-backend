@@ -4,11 +4,16 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.Dto.ApiResponseDto;
 import com.ecommerce.Dto.UserResponseDto;
+import com.ecommerce.Enum.Role;
 import com.ecommerce.entity.User;
+import com.ecommerce.exception.AccessDeniedException;
+import com.ecommerce.exception.NotFound;
 import com.ecommerce.exception.UserNotFound;
 import com.ecommerce.repository.UserRepository;
 
@@ -20,7 +25,15 @@ public class UserService {
 	
 	private final UserRepository userRepo;
 	
+
+	// only for admin
 	public ResponseEntity<ApiResponseDto> getAllUsers(){
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final String email = authentication.getName();
+		User user = userRepo.findByEmail(email).orElseThrow(()-> new NotFound("user"));
+		if(!user.getRole().equals(Role.ADMIN)) {
+			throw new AccessDeniedException("only admin can access");
+		}
 		List<UserResponseDto> users = userRepo.findAll().stream().map(UserResponseDto::new).toList();
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"users fetched",users));
 	}

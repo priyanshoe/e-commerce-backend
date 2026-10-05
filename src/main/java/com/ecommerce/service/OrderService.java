@@ -19,6 +19,7 @@ import com.ecommerce.Dto.OrderRequestDto;
 import com.ecommerce.Dto.OrderResponseDto;
 import com.ecommerce.Dto.OrderSellerResponseDto;
 import com.ecommerce.Enum.OrderStatus;
+import com.ecommerce.Enum.Role;
 import com.ecommerce.entity.Business;
 import com.ecommerce.entity.CartItem;
 import com.ecommerce.entity.Order;
@@ -47,7 +48,30 @@ public class OrderService {
 	private final CartItemRepository cartRepo;
 	private final BusinessRepository businessRepo;
 	
-	
+
+
+	// only for admin
+	public ResponseEntity<ApiResponseDto> getAllOrders(){
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final String email = authentication.getName();
+		User user = userRepo.findByEmail(email).orElseThrow(()-> new NotFound("user"));
+		if(!user.getRole().equals(Role.ADMIN)) {
+			throw new AccessDeniedException("only admin can access");
+		}
+		ArrayList<OrderResponseDto> response = new ArrayList<OrderResponseDto>();
+		List<Order> orders = orderRepo.findAll();
+		for(Order order:orders) {
+			ArrayList<OrderItemResponseDto> orderItemDto = order.getOrderItems().stream()
+					.map(OrderItemResponseDto::new)
+					.collect(Collectors.toCollection(ArrayList::new));
+			OrderResponseDto orderDto = new OrderResponseDto(order);
+			orderDto.setOrderItems(orderItemDto);
+			response.add(orderDto);
+		}
+		
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDto(true,"orders fetched",response));
+	}
 
 	public ResponseEntity<ApiResponseDto> getOrderById(Long id){
 		
@@ -90,6 +114,7 @@ public class OrderService {
 			List<Order> orders = orderRepo.findOrdersByBusinessId(item.getId());
 			for(Order order:orders) { // for each order
 				OrderSellerResponseDto orderDto = new OrderSellerResponseDto(order);
+				BigDecimal earning = BigDecimal.ZERO;
 				if(!orderIds.add(order.getId())) {// prevent duplicate data
 					continue;
 				}
@@ -100,9 +125,12 @@ public class OrderService {
 						continue;
 					}
 					OrderItemResponseDto orderItemDto = new OrderItemResponseDto(orderItem);
+					BigDecimal subTotal = orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
+					earning = earning.add(subTotal);
 					orderItemDtoList.add(orderItemDto);					
 				}
 				orderDto.setOrderItems(orderItemDtoList);
+				orderDto.setTotalAmount(earning);
 				orderDtoList.add(orderDto);
 			}
 			
@@ -178,7 +206,9 @@ public class OrderService {
 		boolean isSellerOrder = existingOrder.getOrderItems().stream()
 			.anyMatch(item-> buzIds.contains(item.getProduct().getBusiness().getId()));
 		if(!isSellerOrder) {
-			throw new AccessDeniedException("you don't own this order");
+			if(!seller.getRole().equals(Role.ADMIN)) {
+				throw new AccessDeniedException("you don't own this order");				
+			}
 		}
 		
 		existingOrder.setStatus(status);
