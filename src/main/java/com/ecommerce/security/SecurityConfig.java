@@ -68,7 +68,9 @@ public class SecurityConfig {
 	CorsConfigurationSource corsConfigurationSource() throws Exception {
 		CorsConfiguration config = new CorsConfiguration();
 		
-		config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:5173","https://e-commerce-five-mu-41.vercel.app"));
+		config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:5173",
+				"https://e-commerce-five-mu-41.vercel.app", // production
+				"https://e-commerce-git-working-priyanshoes-projects.vercel.app")); // pre-production
 		config.setAllowedMethods(List.of("GET","POST","PATCH","PUT","DELETE","OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		
