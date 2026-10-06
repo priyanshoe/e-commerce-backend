@@ -31,7 +31,7 @@ public class SecurityConfig {
 		http
 		.csrf(csrf -> csrf.disable())
 //		.httpBasic(httpBasic -> {Customizer.withDefaults();})
-		.cors(cors -> {})
+		.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 		.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		.authorizeHttpRequests(auth -> auth
 				// public api's
@@ -65,7 +65,7 @@ public class SecurityConfig {
 	}
 	
 	@Bean
-	CorsConfigurationSource corsConfigurationSource() throws Exception {
+	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 		
 		config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:5173",
