@@ -10,8 +10,8 @@ It implements role-based authorization for **Admin, Seller, and Customer** users
 
 This backend is part of a full-stack E-Commerce application built using React.js and Spring Boot.
 
-- **Frontend Repository:** [E-Commerce Frontend](https://github.com/priyanshoe/e-commerce/)
-- **Live Application:** [QuickCart – Live Demo](https://e-commerce-five-mu-41.vercel.app/)
+- **Frontend Repository:** <a href="https://github.com/priyanshoe/e-commerce" target="_blank">E-Commerce Frontend</a>
+- **Live Application:**  <a href="https://github.com/priyanshoe/e-commerce" target="_blank">QuickCart – Live Demo </a>
 
 ### Project Architecture
 
